@@ -1,0 +1,28 @@
+name: Upstream Sync
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 每天凌晨 0 点运行（UTC 时间）
+  workflow_dispatch: # 允许你手动点击按钮测试运行
+
+jobs:
+  sync_latest_from_upstream:
+    name: Sync latest commits from upstream repo
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }} # 确保只有在 fork 的仓库中才运行
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+
+      - name: Sync upstream
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
+        with:
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          target_sync_branch: main # 你的 fork 仓库的分支名
+          upstream_sync_repo: yincongcyincong/weixin-macos # 上游原仓库路径
+          upstream_sync_branch: main # 上游原仓库的分支名
+          test_mode: false
